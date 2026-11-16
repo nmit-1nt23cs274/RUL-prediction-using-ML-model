@@ -1,0 +1,5 @@
+dataset=FD002
+RMSE=34.289120
+PHM08=32092.060547
+window=30
+epochs=35

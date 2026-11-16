@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RUL Prediction &amp; IIoT Priority Scheduler</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="dark-theme">
+    <div class="app-layout">
+        
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <svg class="turbine-logo" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M12 2v7M12 15v7M2 12h7M15 12h7M5.6 5.6l4.9 4.9M13.5 13.5l4.9 4.9M18.4 5.6l-4.9 4.9M10.5 13.5L5.6 18.4"></path>
+                </svg>
+                <div class="sidebar-title">
+                    <h2>RUL PREDICTION &amp;</h2>
+                    <h3>IIoT PRIORITY SCHEDULER</h3>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="/" class="nav-item active">
+                    <span class="nav-icon">📊</span> Dashboard
+                </a>
+            </nav>
+            
+            <div class="sidebar-status-box">
+                <div class="status-item">
+                    <span class="status-label">SYSTEM STATUS</span>
+                    <span class="status-value green-dot">All Systems Operational</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">MODEL STATUS</span>
+                    <span class="status-value highlight-text">Ready for Inference</span>
+                    <span class="status-subtext">Select Subdataset Below</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content flex-col justify-center align-center">
+            
+            <!-- Upload Container Card -->
+            <div class="card upload-box-container">
+                <header class="upload-box-header">
+                    <span class="badge badge-primary">Fleet Telemetry Gateway</span>
+                    <h1>Upload Engine Telemetry Data</h1>
+                    <p class="subtitle">Upload a C-MAPSS whitespace-separated file to predict Remaining Useful Life (RUL) and prioritize network transmission.</p>
+                </header>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+
+                <form method="POST" action="/predict" enctype="multipart/form-data" class="upload-form">
+                    <div class="drop-zone" id="dropZone">
+                        <input type="file" name="file" id="file" accept=".txt,.csv" required>
+                        <label for="file" class="drop-zone-label">
+                            <div class="upload-icon">📂</div>
+                            <span class="drop-text">Click or drag a <strong>test_FD00x.txt</strong> file here</span>
+                            <span class="file-hint">Standard whitespace-separated C-MAPSS 26-column format</span>
+                        </label>
+                    </div>
+
+                    <div class="form-row-vertical">
+                        <div class="form-group w-100">
+                            <label for="dataset" class="form-label">
+                                C-MAPSS Dataset Subset
+                                <span class="form-hint">(Ensure matching checkpoint exists)</span>
+                            </label>
+                            <select name="dataset" id="dataset" class="form-input">
+                                <option value="FD001">FD001</option>
+                                <option value="FD002">FD002</option>
+                                <option value="FD003">FD003</option>
+                                <option value="FD004">FD004</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group w-100">
+                            <label for="bandwidth_limit" class="form-label">
+                                Transmission Bandwidth Limit
+                                <span class="form-hint">(Max active slots per cycle)</span>
+                            </label>
+                            <input type="number" name="bandwidth_limit" id="bandwidth_limit"
+                                   value="10" min="1" max="100" class="form-input">
+                        </div>
+
+                        <div class="form-group w-100" style="margin-top: 8px;">
+                            <button type="submit" class="btn btn-primary w-100 btn-lg">
+                                Run Prognostics &amp; Scheduler
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+        </main>
+    </div>
+
+    <script>
+    document.getElementById('file').addEventListener('change', function() {
+        var label = document.querySelector('.drop-text');
+        if (this.files.length > 0) {
+            label.innerHTML = 'Selected: <strong>' + this.files[0].name + '</strong>';
+        }
+    });
+    </script>
+</body>
+</html>
